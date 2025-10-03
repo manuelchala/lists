@@ -5,7 +5,8 @@
   <title>Select Line</title>
 </head>
 <body>
-  <label for="line">Select line:</label>
+  <h2>Select a Line</h2>
+  <label for="line">Choose line:</label>
   <select id="line">
     <option value="">-- Select --</option>
     <option value="179">Line 179</option>
@@ -21,38 +22,34 @@
     dropdown.addEventListener("change", async () => {
       const choice = dropdown.value;
       if (!choice) return;
-      status.textContent = "Sending...";
 
-      // Trigger GitHub Action via workflow_dispatch
-      // You need to create a PAT in your GitHub settings with "repo" permissions
-      // This token is stored in a GitHub Action secret, so we will not put it here
+      status.textContent = "Sending request...";
 
-      const repo = "YOUR_USERNAME/YOUR_REPO";
-      const workflow = "update-selection.yml"; // will create this next
-
-      await fetch(`https://api.github.com/repos/${repo}/actions/workflows/${workflow}/dispatches`, {
-        method: "POST",
-        headers: {
-          "Accept": "application/vnd.github.v3+json",
-          "Authorization": "token YOUR_PERSONAL_ACCESS_TOKEN"
-        },
-        body: JSON.stringify({
-          ref: "main",  // branch
-          inputs: { line_id: choice }
-        })
-      }).then(res => {
-        if (res.ok) {
-          status.textContent = `Saved line: ${choice}`;
-        } else {
-          status.textContent = `Error: ${res.status}`;
+      // Create an Issue instead of pushing directly
+      const res = await fetch(
+        "https://api.github.com/repos/YOUR_USERNAME/YOUR_REPO/issues",
+        {
+          method: "POST",
+          headers: {
+            "Accept": "application/vnd.github+json",
+            // ⚠️ No token here – visitors won’t see your PAT
+          },
+          body: JSON.stringify({
+            title: `Line selection: ${choice}`,
+            body: `The selected line is ${choice}`
+          })
         }
-      }).catch(err => {
-        status.textContent = "Error sending request!";
-        console.error(err);
-      });
+      );
+
+      if (res.ok) {
+        status.textContent = `✅ Selection sent: ${choice}`;
+      } else {
+        status.textContent = `❌ Error: ${res.status}`;
+      }
     });
   </script>
 </body>
 </html>
+
 
 
