@@ -1,17 +1,18 @@
 name: Update selection
 
 on:
-  workflow_dispatch: # allows manual/API triggers
+  workflow_dispatch:
     inputs:
       line_id:
         description: "Selected line"
         required: true
-        default: "179"
+
+permissions:
+  contents: write
 
 jobs:
   update-json:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -26,5 +27,6 @@ jobs:
           git add selection.json
           git commit -m "Update line_id to ${{ github.event.inputs.line_id }}" || echo "No changes"
           git push https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git
+
 
 
