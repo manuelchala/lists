@@ -14,10 +14,10 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Extract line_id from issue
-        id: parse
+      - name: Extract line_id from issue body
         run: |
-          echo "line_id=$(echo '${{ github.event.issue.title }}' | grep -o '[0-9]\+')" >> $GITHUB_ENV
+          echo "Issue body: ${{ github.event.issue.body }}"
+          echo "line_id=${{ github.event.issue.body }}" >> $GITHUB_ENV
 
       - name: Update selection.json
         run: |
