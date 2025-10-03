@@ -1,0 +1,27 @@
+name: Update selection
+
+on:
+  workflow_dispatch: # allows manual/API triggers
+    inputs:
+      line_id:
+        description: "Selected line"
+        required: true
+        default: "179"
+
+jobs:
+  update-json:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Update selection.json
+        run: |
+          echo "{\"line_id\": \"${{ github.event.inputs.line_id }}\"}" > selection.json
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add selection.json
+          git commit -m "Update line_id to ${{ github.event.inputs.line_id }}" || echo "No changes to commit"
+          git push
+
