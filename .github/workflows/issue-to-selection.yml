@@ -1,0 +1,29 @@
+name: Update selection from issue
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+
+jobs:
+  update-selection:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Extract line_id from issue
+        id: parse
+        run: |
+          echo "line_id=$(echo '${{ github.event.issue.title }}' | grep -o '[0-9]\+')" >> $GITHUB_ENV
+
+      - name: Update selection.json
+        run: |
+          echo "{\"line_id\": \"${line_id}\"}" > selection.json
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add selection.json
+          git commit -m "Update line_id to ${line_id}" || echo "No changes"
+          git push
